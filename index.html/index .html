@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Silent Web Tech - DJ Silayo</title>
+    <style>
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0a0f;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1a73e8;
+            border-radius: 4px;
+        }
+
+        /* ===== LOGIN SCREEN ===== */
+        #loginScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        #loginScreen.hidden {
+            display: none;
+        }
+        .login-box {
+            background: #111827;
+            padding: 3rem 2.5rem;
+            border-radius: 20px;
+            border: 2px solid #1a73e8;
+            box-shadow: 0 0 60px rgba(26, 115, 232, 0.15);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        .login-box .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1a73e8;
+            margin-bottom: 0.5rem;
+        }
+        .login-box .logo span {
+            color: #fff;
+        }
+        .login-box .sub {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+        .login-box input {
+            width: 100%;
+            padding: 0.9rem;
+            border-radius: 10px;
+            border: 2px solid #1a3a5a;
+            background: #0a0a0f;
+            color: #fff;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            transition: border-color 0.3s;
+        }
+        .login-box input:focus {
+            outline: none;
+            border-color: #1a73e8;
+        }
+        .login-box .btn {
+            width: 100%;
+            background: #1a73e8;
+            color: #fff;
+            border: none;
+            padding: 0.9rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .login-box .btn:hover {
+            background: #1557b0;
+            transform: scale(1.02);
+            box-shadow: 0 0 30px rgba(26, 115, 232, 0.3);
+        }
+        .login-box .error {
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            min-height: 1.5rem;
+        }
+        .login-box .hint {
+            color: #555;
+            font-size: 0.75rem;
+            margin-top: 1rem;
+            border-top: 1px solid #1a3a5a;
+            padding-top: 1rem;
+        }
+        .login-box .hint span {
+            color: #4fc3f7;
+            font-weight: 600;
+        }
+
+        /* ===== MAIN SITE (hidden until login) ===== */
+        #mainSite {
+            display: none;
+        }
+        #mainSite.visible {
+            display: block;
+        }
+
+        /* ===== HEADER / NAV ===== */
+        header {
+            background: linear-gradient(135deg, #0a0a0f 0%, #0d1b2a 100%);
+            border-bottom: 2px solid #1a73e8;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo-main {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1a73e8;
+            text-shadow: 0 0 20px rgba(26, 115, 232, 0.3);
+        }
+        .logo-main span {
+            color: #fff;
+        }
+        nav {
+            display: flex;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        nav a {
+            color: #b0b0b0;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        nav a:hover,
+        nav a.active {
+            color: #fff;
+            background: #1a73e8;
+            box-shadow: 0 0 20px rgba(26, 115, 232, 0.2);
+        }
+        .logout-btn {
+            background: transparent;
+            border: 1px solid #ff6b6b;
+            color: #ff6b6b;
+            padding: 0.3rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+        .logout-btn:hover {
+            background: #ff6b6b;
+            color: #fff;
+        }
+
+        /* ===== SECTIONS ===== */
+        .section {
+            display: none;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            animation: fadeUp 0.5s ease;
+        }
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            text-align: center;
+            padding: 4rem 1rem;
+            background: radial-gradient(circle at center, #0d1b2a 0%, #0a0a0f 70%);
+            border-radius: 20px;
+            border: 1px solid #1a3a5a;
+        }
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1a73e8, #4fc3f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            color: #999;
+            margin: 1rem 0;
+        }
+        .hero .owner {
+            color: #4fc3f7;
+            font-weight: 600;
+        }
+
+        /* ===== CARDS ===== */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        .card {
+            background: #111827;
+            padding: 1.8rem;
+            border-radius: 16px;
+            border: 1px solid #1a3a5a;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        .card:hover {
+            transform: translateY(-6px);
+            border-color: #1a73e8;
+            box-shadow: 0 8px 30px rgba(26, 115, 232, 0.15);
+        }
+        .card .icon {
+            font-size: 2.8rem;
+            margin-bottom: 0.8rem;
+        }
+        .card h3 {
+            color: #1a73e8;
+            margin-bottom: 0.5rem;
+        }
+        .card p {
+            color: #aaa;
+            font-size: 0.95rem;
+        }
+
+        /* ===== SESSION BOX ===== */
+        .session-box {
+            background: #111827;
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid #1a3a5a;
+            max-width: 500px;
+            margin: 2rem auto;
+            text-align: center;
+        }
+        .session-box input {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid #1a3a5a;
+            background: #0a0a0f;
+            color: #fff;
+            font-size: 1rem;
+            margin: 0.5rem 0;
+        }
+        .session-box input:focus {
+            outline: none;
+            border-color: #1a73e8;
+        }
+        .btn {
+            background: #1a73e8;
+            color: #fff;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            margin: 0.3rem;
+        }
+        .btn:hover {
+            background: #1557b0;
+            transform: scale(1.03);
+            box-shadow: 0 0 30px rgba(26, 115, 232, 0.3);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #1a73e8;
+            color: #1a73e8;
+        }
+        .btn-outline:hover {
+            background: #1a73e8;
+            color: #fff;
+        }
+        .qr-placeholder {
+            background: #0a0a0f;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 2px dashed #1a3a5a;
+            margin: 1rem 0;
+            color: #666;
+        }
+
+        /* ===== MUSIC PLAYER ===== */
+        .music-player {
+            background: #111827;
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid #1a3a5a;
+            max-width: 500px;
+            margin: 1rem auto;
+            text-align: center;
+        }
+        .music-player .track {
+            color: #4fc3f7;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        .music-player .artist {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        .music-player audio {
+            width: 100%;
+            margin: 0.8rem 0;
+            border-radius: 8px;
+        }
+        .music-player audio::-webkit-media-controls-panel {
+            background: #0a0a0f;
+        }
+
+        /* ===== GAME ===== */
+        .game-container {
+            background: #111827;
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid #1a3a5a;
+            max-width: 600px;
+            margin: 1rem auto;
+            text-align: center;
+        }
+        .game-container canvas {
+            background: #0a0a0f;
+            border-radius: 12px;
+            border: 2px solid #1a3a5a;
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            aspect-ratio: 500/400;
+        }
+        .game-container .controls {
+            color: #888;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* ===== AI CHAT ===== */
+        .chat-box {
+            background: #111827;
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid #1a3a5a;
+            max-width: 600px;
+            margin: 1rem auto;
+        }
+        .chat-messages {
+            height: 250px;
+            overflow-y: auto;
+            background: #0a0a0f;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #1a3a5a;
+        }
+        .chat-messages .msg {
+            margin: 0.5rem 0;
+            padding: 0.6rem 1rem;
+            border-radius: 12px;
+            max-width: 80%;
+        }
+        .chat-messages .user {
+            background: #1a73e8;
+            color: #fff;
+            margin-left: auto;
+            text-align: right;
+        }
+        .chat-messages .bot {
+            background: #1a1a2e;
+            color: #ccc;
+        }
+        .chat-input {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid #1a3a5a;
+            background: #0a0a0f;
+            color: #fff;
+        }
+        .chat-input input:focus {
+            outline: none;
+            border-color: #1a73e8;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid #1a3a5a;
+            color: #555;
+            font-size: 0.9rem;
+            margin-top: 2rem;
+        }
+        footer span {
+            color: #1a73e8;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 0.8rem;
+                padding: 1rem;
+            }
+            nav {
+                justify-content: center;
+            }
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            .section {
+                padding: 1rem;
+            }
+            .login-box {
+                padding: 2rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== LOGIN SCREEN ===== -->
+    <div id="loginScreen">
+        <div class="login-box">
+            <div class="logo">Silent<span>Web</span>Tech</div>
+            <div class="sub">🔐 Enter password to access</div>
+            <input type="password" id="passwordInput" placeholder="Enter password..." autofocus />
+            <button class="btn" onclick="checkPassword()">Unlock</button>
+            <div class="error" id="loginError"></div>
+            <div class="hint">🔑 Default password: <span>silent2024</span></div>
+        </div>
+    </div>
+
+    <!-- ===== MAIN SITE (hidden until login) ===== -->
+    <div id="mainSite">
+
+        <!-- ===== HEADER ===== -->
+        <header>
+            <div class="logo-main">Silent<span>Web</span>Tech</div>
+            <nav>
+                <a class="active" data-section="home">Home</a>
+                <a data-section="session">Session</a>
+                <a data-section="music">Music</a>
+                <a data-section="games">Games</a>
+                <a data-section="ai">AI Chat</a>
+                <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+            </nav>
+        </header>
+
+        <!-- ===== HOME ===== -->
+        <section id="home" class="section active">
+            <div class="hero">
+                <h1>Silent Web Tech</h1>
+                <p>Owned by <span class="owner">DJ Silayo</span></p>
+                <p style="color:#666;font-size:1rem;">Your all-in-one tech hub — Sessions, Music, Games &amp; AI</p>
+                <div style="margin-top:1.5rem;display:flex;gap:0.8rem;justify-content:center;flex-wrap:wrap;">
+                    <button class="btn" onclick="navigateTo('session')">Get Session</button>
+                    <button class="btn btn-outline" onclick="navigateTo('music')">Listen to Music</button>
+                    <button class="btn btn-outline" onclick="navigateTo('games')">Play Games</button>
+                </div>
+            </div>
+
+            <div class="card-grid">
+                <div class="card">
+                    <div class="icon">🔐</div>
+                    <h3>WhatsApp Session</h3>
+                    <p>QR code or 8-digit pairing code</p>
+                </div>
+                <div class="card">
+                    <div class="icon">🎵</div>
+                    <h3>Ronis Goliath</h3>
+                    <p>Exclusive music player</p>
+                </div>
+                <div class="card">
+                    <div class="icon">🏎️</div>
+                    <h3>Car Racing</h3>
+                    <p>Play and compete</p>
+                </div>
+                <div class="card">
+                    <div class="icon">🤖</div>
+                    <h3>AI Assistant</h3>
+                    <p>Powered by Gemini</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== SESSION ===== -->
+        <section id="session" class="section">
+            <h2 style="color:#1a73e8;text-align:center;margin-bottom:1rem;">🔐 Get Your WhatsApp Session</h2>
+            <p style="text-align:center;color:#888;max-width:500px;margin:0 auto 1rem;">Choose QR code or enter an 8-digit pairing code.</p>
+
+            <div class="session-box">
+                <h3 style="color:#4fc3f7;">QR Code</h3>
+                <div class="qr-placeholder">
+                    📱 Scan with WhatsApp<br />
+                    <span style="font-size:0.8rem;color:#555;">(QR will appear here in production)</span>
+                </div>
+                <button class="btn" onclick="alert('QR Code generated! (Simulated)')">Generate QR</button>
+            </div>
+
+            <div class="session-box">
+                <h3 style="color:#4fc3f7;">8-Digit Pairing Code</h3>
+                <input type="text" placeholder="Enter phone number (e.g., 628123456789)" id="phoneInput" />
+                <button class="btn" onclick="generatePairingCode()">Get Pairing Code</button>
+                <div id="pairingResult" style="margin-top:1rem;color:#4fc3f7;font-weight:600;"></div>
+            </div>
+        </section>
+
+        <!-- ===== MUSIC ===== -->
+        <section id="music" class="section">
+            <h2 style="color:#1a73e8;text-align:center;margin-bottom:1rem;">🎵 Ronis Goliath</h2>
+            <p style="text-align:center;color:#888;">Exclusive tracks from Ronis Goliath</p>
+
+            <div class="music-player">
+                <div class="track">Track 1 - Ronis Goliath</div>
+                <div class="artist">Ronis Goliath</div>
+                <audio controls>
+                    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg" />
+                    Your browser does not support audio.
+                </audio>
+            </div>
+
+            <div class="music-player">
+                <div class="track">Track 2 - Ronis Goliath</div>
+                <div class="artist">Ronis Goliath</div>
+                <audio controls>
+                    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg" />
+                    Your browser does not support audio.
+                </audio>
+            </div>
+
+            <div class="music-player">
+                <div class="track">Track 3 - Ronis Goliath</div>
+                <div class="artist">Ronis Goliath</div>
+                <audio controls>
+                    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" type="audio/mpeg" />
+                    Your browser does not support audio.
+                </audio>
+            </div>
+        </section>
+
+        <!-- ===== GAMES ===== -->
+        <section id="games" class="section">
+            <h2 style="color:#1a73e8;text-align:center;margin-bottom:1rem;">🏎️ Car Racing Game</h2>
+            <p style="text-align:center;color:#888;">Use arrow keys to dodge traffic!</p>
+
+            <div class="game-container">
+                <canvas id="gameCanvas" width="500" height="400"></canvas>
+                <div class="controls">⬆️ Up | ⬇️ Down | ⬅️ Left | ➡️ Right</div>
+                <button class="btn" id="restartBtn" style="margin-top:0.5rem;">Restart</button>
+                <div id="scoreDisplay" style="color:#4fc3f7;font-weight:600;margin-top:0.5rem;">Score: 0</div>
+            </div>
+        </section>
+
+        <!-- ===== AI CHAT ===== -->
+        <section id="ai" class="section">
+            <h2 style="color:#1a73e8;text-align:center;margin-bottom:1rem;">🤖 AI Assistant</h2>
+            <p style="text-align:center;color:#888;">Ask me anything about Silent Web Tech!</p>
+
+            <div class="chat-box">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="msg bot">👋 Welcome to Silent Web Tech! I'm your AI assistant. How can I help you today?<br />
+                    <span style="font-size:0.8rem;color:#666;">Try: "Get session" or "Play music" or "Car game"</span></div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="chatInput" placeholder="Type your message..." />
+                    <button class="btn" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== FOOTER ===== -->
+        <footer>
+            &copy; 2026 <span>Silent Web Tech</span> — Owned by DJ Silayo — 100% Free
+        </footer>
+
+    </div><!-- end mainSite -->
+
+    <!-- ============================================================ -->
+    <!-- JAVASCRIPT -->
+    <!-- ============================================================ -->
+    <script>
+        // ===== PASSWORD CONFIGURATION =====
+        // 🔑 Change this to your desired password
+        const CORRECT_PASSWORD = 'silent2024';
+
+        // ===== LOGIN FUNCTIONS =====
+        function checkPassword() {
+            const input = document.getElementById('passwordInput');
+            const error = document.getElementById('loginError');
+            const password = input.value.trim();
+
+            if (password === CORRECT_PASSWORD) {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainSite').classList.add('visible');
+                error.textContent = '';
+                // Store login state in session (optional)
+                sessionStorage.setItem('loggedIn', 'true');
+            } else {
+                error.textContent = '❌ Incorrect password. Try again.';
+                input.value = '';
+                input.focus();
+                // Shake animation (simple)
+                input.style.borderColor = '#ff6b6b';
+                setTimeout(() => input.style.borderColor = '', 1000);
+            }
+        }
+
+        function logout() {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('mainSite').classList.remove('visible');
+            sessionStorage.removeItem('loggedIn');
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('passwordInput').focus();
+        }
+
+        // ===== CHECK SESSION ON LOAD =====
+        window.addEventListener('load', function() {
+            if (sessionStorage.getItem('loggedIn') === 'true') {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainSite').classList.add('visible');
+            } else {
+                document.getElementById('passwordInput').focus();
+            }
+        });
+
+        // ===== ENTER KEY FOR LOGIN =====
+        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') checkPassword();
+        });
+
+        // ===== NAVIGATION =====
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const sectionId = this.dataset.section;
+                navigateTo(sectionId);
+            });
+        });
+
+        function navigateTo(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+            document.querySelector(`nav a[data-section="${sectionId}"]`).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ===== PAIRING CODE =====
+        function generatePairingCode() {
+            const phone = document.getElementById('phoneInput').value.trim();
+            if (!phone) {
+                document.getElementById('pairingResult').innerHTML = '⚠️ Please enter your phone number.';
+                document.getElementById('pairingResult').style.color = '#ff6b6b';
+                return;
+            }
+            const code = Math.floor(10000000 + Math.random() * 90000000);
+            document.getElementById('pairingResult').innerHTML = `✅ Pairing Code: <span style="font-size:1.5rem;">${code}</span><br />
+            <span style="font-size:0.8rem;color:#888;">Use this in WhatsApp → Linked Devices → Link with phone number</span>`;
+            document.getElementById('pairingResult').style.color = '#4fc3f7';
+        }
+
+        // ===== CAR RACING GAME =====
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+
+        let player = { x: 230, y: 340, width: 40, height: 50 };
+        let obstacles = [];
+        let score = 0;
+        let gameOver = false;
+        let frames = 0;
+        let speed = 5;
+        let keys = {};
+        let roadOffset = 0;
+
+        document.addEventListener('keydown', e => { keys[e.key] = true; });
+        document.addEventListener('keyup', e => { keys[e.key] = false; });
+
+        function resetGame() {
+            player = { x: 230, y: 340, width: 40, height: 50 };
+            obstacles = [];
+            score = 0;
+            gameOver = false;
+            speed = 5;
+            frames = 0;
+            scoreDisplay.textContent = 'Score: 0';
+            document.getElementById('restartBtn').textContent = 'Restart';
+        }
+
+        function spawnObstacle() {
+            const lane = Math.floor(Math.random() * 5) * 45 + 30;
+            obstacles.push({
+                x: lane,
+                y: -50,
+                width: 40,
+                height: 60,
+                color: `hsl(${Math.random() * 60 + 180}, 70%, 50%)`
+            });
+        }
+
+        function updateGame() {
+            if (gameOver) return;
+
+            if (keys['ArrowLeft'] && player.x > 20) player.x -= 6;
+            if (keys['ArrowRight'] && player.x < 440) player.x += 6;
+            if (keys['ArrowUp'] && player.y > 20) player.y -= 6;
+            if (keys['ArrowDown'] && player.y < 360) player.y += 6;
+
+            frames++;
+            if (frames % 25 === 0) {
+                spawnObstacle();
+                if (frames % 80 === 0) speed += 0.5;
+            }
+
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                obstacles[i].y += speed;
+                if (obstacles[i].y > 450) {
+                    obstacles.splice(i, 1);
+                    score++;
+                    scoreDisplay.textContent = 'Score: ' + score;
+                }
+            }
+
+            for (let obs of obstacles) {
+                if (player.x < obs.x + obs.width &&
+                    player.x + player.width > obs.x &&
+                    player.y < obs.y + obs.height &&
+                    player.y + player.height > obs.y) {
+                    gameOver = true;
+                    document.getElementById('restartBtn').textContent = '💥 Game Over! Restart';
+                    return;
+                }
+            }
+
+            roadOffset = (roadOffset + speed) % 80;
+        }
+
+        function drawGame() {
+            ctx.fillStyle = '#0a0a0f';
+            ctx.fillRect(0, 0, 500, 400);
+
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(20, 0, 460, 400);
+
+            ctx.strokeStyle = '#4fc3f7';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([30, 30]);
+            ctx.beginPath();
+            for (let i = -80; i < 480; i += 80) {
+                const y = (i + roadOffset) % 480 - 40;
+                ctx.moveTo(250, y);
+                ctx.lineTo(250, y + 40);
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.strokeStyle = '#1a73e8';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(20, 0);
+            ctx.lineTo(20, 400);
+            ctx.moveTo(480, 0);
+            ctx.lineTo(480, 400);
+            ctx.stroke();
+
+            for (let obs of obstacles) {
+                ctx.fillStyle = obs.color;
+                ctx.shadowColor = obs.color;
+                ctx.shadowBlur = 20;
+                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#0a0a0f';
+                ctx.fillRect(obs.x + 6, obs.y + 8, 12, 12);
+                ctx.fillRect(obs.x + 22, obs.y + 8, 12, 12);
+            }
+
+            ctx.shadowColor = '#1a73e8';
+            ctx.shadowBlur = 30;
+            ctx.fillStyle = '#1a73e8';
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+            ctx.fillStyle = '#0a0a0f';
+            ctx.shadowBlur = 0;
+            ctx.fillRect(player.x + 6, player.y + 8, 10, 12);
+            ctx.fillRect(player.x + 24, player.y + 8, 10, 12);
+            ctx.fillStyle = '#ffeb3b';
+            ctx.fillRect(player.x + 6, player.y - 4, 8, 6);
+            ctx.fillRect(player.x + 26, player.y - 4, 8, 6);
+
+            if (gameOver) {
+                ctx.fillStyle = 'rgba(0,0,0,0.7)';
+                ctx.fillRect(0, 0, 500, 400);
+                ctx.fillStyle = '#ff6b6b';
+                ctx.font = 'bold 36px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('💥 GAME OVER', 250, 180);
+                ctx.fillStyle = '#fff';
+                ctx.font = '20px sans-serif';
+                ctx.fillText('Score: ' + score, 250, 240);
+            }
+        }
+
+        function gameLoop() {
+            updateGame();
+            drawGame();
+            requestAnimationFrame(gameLoop);
+        }
+
+        document.getElementById('restartBtn').addEventListener('click', resetGame);
+        gameLoop();
+
+        // ===== AI CHAT =====
+        const GEMINI_API_KEY = ''; // Get free key from https://ai.google.dev/
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            const chatDiv = document.getElementById('chatMessages');
+            chatDiv.innerHTML += `<div class="msg user">${msg}</div>`;
+
+            const response = await getAIResponse(msg);
+            chatDiv.innerHTML += `<div class="msg bot">${response}</div>`;
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+            input.value = '';
+        }
+
+        async function getAIResponse(msg) {
+            const lower = msg.toLowerCase();
+
+            if (lower.includes('session') || lower.includes('pair') || lower.includes('whatsapp')) {
+                return `🔐 To get your WhatsApp session, go to the <b>Session</b> page. You can use a QR code or an 8-digit pairing code. Just enter your phone number and click "Get Pairing Code"!`;
+            }
+            if (lower.includes('music') || lower.includes('ronis') || lower.includes('goliath')) {
+                return `🎵 Check out the <b>Music</b> page to listen to Ronis Goliath's exclusive tracks! All songs are free to stream.`;
+            }
+            if (lower.includes('game') || lower.includes('car') || lower.includes('race')) {
+                return `🏎️ Head to the <b>Games</b> page to play Car Racing! Use arrow keys to dodge traffic and get the highest score. Good luck!`;
+            }
+            if (lower.includes('help') || lower.includes('how')) {
+                return `🤖 I'm here to help! You can ask me about:<br/>
+                • <b>Session</b> — WhatsApp pairing info<br/>
+                • <b>Music</b> — Ronis Goliath tracks<br/>
+                • <b>Games</b> — Car racing game<br/>
+                • <b>Silent Web Tech</b> — About this site<br/>
+                Just ask! 😊`;
+            }
+            if (lower.includes('owner') || lower.includes('dj') || lower.includes('silayo')) {
+                return `👨‍💼 Silent Web Tech is owned by <b>DJ Silayo</b>. He created this platform to bring together sessions, music, games, and AI — all for free!`;
+            }
+
+            if (GEMINI_API_KEY) {
+                try {
+                    const res = await fetch(
+                        `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`,
+                        {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                contents: [{
+                                    parts: [{
+                                        text: `You are the AI assistant for "Silent Web Tech", a free tech platform owned by DJ Silayo. Answer this user question briefly and helpfully: "${msg}"`
+                                    }]
+                                }]
+                            })
+                        }
+                    );
+                    const data = await res.json();
+                    return data.candidates?.[0]?.content?.parts?.[0]?.text ||
+                        `
