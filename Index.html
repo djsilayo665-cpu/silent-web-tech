@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Silent DJ TECH</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav>
+    <div class="logo">🎧 Silent DJ TECH</div>
+    <ul>
+      <li><a href="#home">Home</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#deploy">Deploy</a></li>
+      <li><a href="#dashboard">Dashboard</a></li>
+      <li><a href="#game">Game</a></li>
+      <li><a href="#admin">Admin</a></li>
+    </ul>
+    <div class="auth-buttons">
+      <a href="#login" class="btn-outline">Login</a>
+      <a href="#register" class="btn-primary">Sign Up</a>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <section id="home" class="hero">
+    <div class="hero-content">
+      <h1 class="glow-text">Silent DJ TECH</h1>
+      <p class="subtitle">Host your WhatsApp bot — pay in your currency, deploy in one click.</p>
+      <div class="hero-buttons">
+        <a href="#deploy" class="btn-primary">🚀 Deploy Now</a>
+        <a href="#features" class="btn-outline">Learn More</a>
+      </div>
+      <div class="stats">
+        <span>🔥 500+ Bots Deployed</span>
+        <span>⚡ 99.99% Uptime</span>
+        <span>🌍 10+ Currencies</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FEATURES ===== -->
+  <section id="features" class="features">
+    <h2>⚡ Features</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="icon">🚀</div>
+        <h3>One-Click Deploy</h3>
+        <p>Deploy your bot from GitHub in seconds.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">💰</div>
+        <h3>Multi-Currency</h3>
+        <p>Pay in TZS, KES, USD, and more.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🎮</div>
+        <h3>Aviator Game</h3>
+        <p>Win coins and level up.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">📊</div>
+        <h3>Live Logs</h3>
+        <p>Real-time bot logs.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PRICING ===== -->
+  <section id="pricing" class="pricing">
+    <h2>💎 Pricing</h2>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <h3>Basic</h3>
+        <p class="price">$5<span>/mo</span></p>
+        <ul>
+          <li>1 Bot</li>
+          <li>Basic Support</li>
+          <li>24/7 Uptime</li>
+        </ul>
+        <a href="#coins" class="btn-primary">Buy Now</a>
+      </div>
+      <div class="pricing-card featured">
+        <h3>Pro</h3>
+        <p class="price">$15<span>/mo</span></p>
+        <ul>
+          <li>5 Bots</li>
+          <li>Priority Support</li>
+          <li>Live Logs</li>
+        </ul>
+        <a href="#coins" class="btn-primary">Buy Now</a>
+      </div>
+      <div class="pricing-card">
+        <h3>Enterprise</h3>
+        <p class="price">$50<span>/mo</span></p>
+        <ul>
+          <li>Unlimited Bots</li>
+          <li>Dedicated Support</li>
+          <li>Custom Features</li>
+        </ul>
+        <a href="#coins" class="btn-primary">Buy Now</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== DEPLOY ===== -->
+  <section id="deploy" class="deploy">
+    <h2>🚀 Deploy Your Bot</h2>
+    <div class="deploy-form">
+      <label>GitHub Repository URL</label>
+      <input type="url" value="https://github.com/djsilayo665-cpu/silent-dj" />
+      <label>Environment Variables</label>
+      <textarea rows="4">SESSION_ID=your_session_here
+OWNER_NUMBER=255768192847
+BOT_NAME=Silent DJ</textarea>
+      <button class="btn-primary" onclick="startDeploy()">Deploy Bot</button>
+      <div id="deploy-log" class="terminal">
+        <div>⏳ Ready to deploy...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== COINS / PAYMENT ===== -->
+  <section id="coins" class="coins">
+    <h2>💰 Buy Coins</h2>
+    <p>Send payment to <strong>255768192847</strong> (djsilayo)</p>
+    <div class="coin-packages">
+      <div class="coin-card">
+        <h3>100 Coins</h3>
+        <p>$1.00 / 2,500 TZS</p>
+        <button class="btn-primary" onclick="buyCoins(100)">Buy</button>
+      </div>
+      <div class="coin-card">
+        <h3>500 Coins</h3>
+        <p>$4.50 / 11,000 TZS</p>
+        <button class="btn-primary" onclick="buyCoins(500)">Buy</button>
+      </div>
+      <div class="coin-card">
+        <h3>1000 Coins</h3>
+        <p>$8.00 / 20,000 TZS</p>
+        <button class="btn-primary" onclick="buyCoins(1000)">Buy</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== GAME ===== -->
+  <section id="game" class="game">
+    <h2>🎲 Aviator</h2>
+    <div class="game-container">
+      <canvas id="gameCanvas" width="400" height="300"></canvas>
+      <div class="game-controls">
+        <label>Bet (Coins)</label>
+        <input type="number" id="betAmount" value="10" />
+        <button class="btn-primary" onclick="startGame()">🚀 Bet</button>
+        <button class="btn-secondary" onclick="cashOut()">💸 Cash Out</button>
+        <p id="gameResult">Place your bet...</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <p>Built by <strong>djsilayo</strong> — Payment: <strong>255768192847</strong></p>
+    <p>© 2026 Silent DJ TECH. All rights reserved.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
