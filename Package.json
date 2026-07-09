@@ -1,0 +1,26 @@
+{
+  "name": "silent-dj-bot",
+  "version": "1.9.8",
+  "description": "WhatsApp Bot by Silent DJ",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "whatsapp",
+    "bot",
+    "baileys",
+    "railway"
+  ],
+  "author": "Silent DJ",
+  "license": "MIT",
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.18",
+    "axios": "^1.11.0",
+    "chalk": "^5.4.1",
+    "express": "^4.21.2",
+    "pino": "^9.5.0",
+    "qrcode-terminal": "^0.12.0"
+  }
+}
